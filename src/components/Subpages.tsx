@@ -513,7 +513,7 @@ export function BlogPage({ onBack }: SubpageProps) {
 // FormSubmit requires a one-time email confirmation the first time a
 // submission is sent to this address — until that confirmation is completed,
 // submissions are held and an activation email is sent to the inbox.
-const CONTACT_FORM_DESTINATION_EMAIL = "AAAAAACD@gmail.com";
+const CONTACT_FORM_DESTINATION_EMAIL = "AAAAAACD@proton.me";
 const FORMSUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${CONTACT_FORM_DESTINATION_EMAIL}`;
 
 export function ContactPage({ onBack }: SubpageProps) {
