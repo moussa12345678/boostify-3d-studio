@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>BOOSTIFY | Premium 3D Advertising & CGI Animation Studio</title>
+    <meta name="robots" content="noindex" />
+    <!--
+      SPA fallback for GitHub Pages.
+      When a deep link like /boostify-3d-studio/services is requested,
+      GitHub Pages returns this 404.html. We redirect the browser to
+      the hash-based route so the React app can render the correct page.
+      Path-based URLs in sitemap.xml therefore resolve correctly for users.
+    -->
+    <script>
+      (function () {
+        var repoBase = '/boostify-3d-studio';
+        var l = window.location;
+        var path = l.pathname;
+
+        // Strip the repo prefix if present
+        var sub = '';
+        if (path.indexOf(repoBase + '/') === 0) {
+          sub = path.substring(repoBase.length + 1);
+        } else if (path === repoBase) {
+          sub = '';
+        } else {
+          // Not our repo path — just go home
+          sub = '';
+        }
+
+        // Remove trailing slash and any .html suffix
+        sub = sub.replace(/\/+$/, '').replace(/\.html$/i, '');
+
+        var hash = sub ? '#/' + sub : '#/';
+        // Preserve any existing hash fragment
+        if (l.hash && l.hash !== '#/' && l.hash.length > 1) {
+          hash = l.hash;
+        }
+
+        var target = repoBase + '/' + l.search + hash;
+        l.replace(target);
+      })();
+    </script>
+    <meta http-equiv="refresh" content="0; url=/boostify-3d-studio/" />
+  </head>
+  <body>
+    <p>Redirecting… If you are not redirected automatically, <a href="/boostify-3d-studio/">click here</a>.</p>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "BOOSTIFY 3D Studio",
+  "description": "Cinematic 3D Advertising & CGI Animation Portfolio for Luxury Brands",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

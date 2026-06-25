@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# BOOSTIFY 3D Studio — Sitemap
+Sitemap: https://moussa12345678.github.io/boostify-3d-studio/sitemap.xml
