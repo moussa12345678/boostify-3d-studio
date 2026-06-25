@@ -507,9 +507,20 @@ export function BlogPage({ onBack }: SubpageProps) {
 /* ==========================================================================
    5. CONTACT PAGE - MINIMALIST AGENCY ONBOARDING Form
    ========================================================================== */
+
+// Destination email for contact form submissions (routed via FormSubmit.co,
+// a free no-backend form service for static sites hosted on GitHub Pages).
+// FormSubmit requires a one-time email confirmation the first time a
+// submission is sent to this address — until that confirmation is completed,
+// submissions are held and an activation email is sent to the inbox.
+const CONTACT_FORM_DESTINATION_EMAIL = "AAAAAACD@gmail.com";
+const FORMSUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${CONTACT_FORM_DESTINATION_EMAIL}`;
+
 export function ContactPage({ onBack }: SubpageProps) {
   const [formData, setFormData] = useState({ name: "", email: "", brand: "", notes: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const resetTimerRef = useRef<number | null>(null);
 
   // Clear any pending reset timer on unmount to prevent setState on unmounted component
@@ -521,18 +532,69 @@ export function ContactPage({ onBack }: SubpageProps) {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email) return;
-    setSubmitted(true);
-    if (resetTimerRef.current !== null) {
-      window.clearTimeout(resetTimerRef.current);
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      // Build the payload. We include a _subject field so the inbox sees a
+      // clear subject line, a _template field so FormSubmit renders a clean
+      // table layout, and a _captcha=false flag (we have our own client-side
+      // required validation; FormSubmit's optional hCaptcha is disabled).
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        brand: formData.brand || "(not specified)",
+        notes: formData.notes || "(no additional notes)",
+        _subject: `BOOSTIFY contact form — ${formData.name}${formData.brand ? " / " + formData.brand : ""}`,
+        _template: "table",
+        _captcha: "false",
+      };
+
+      const response = await fetch(FORMSUBMIT_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json().catch(() => ({}));
+      // FormSubmit returns { success: "true", message: "..." } on success.
+      // If the destination email has not been confirmed yet, the response
+      // still returns 200 but the actual email is queued for activation.
+      // We treat any 2xx response as a successful submission — the user
+      // should not be penalized for the one-time confirmation step.
+      if (data && data.success === "false") {
+        throw new Error(data.message || "FormSubmit rejected the submission");
+      }
+
+      setSubmitted(true);
+      if (resetTimerRef.current !== null) {
+        window.clearTimeout(resetTimerRef.current);
+      }
+      resetTimerRef.current = window.setTimeout(() => {
+        setSubmitted(false);
+        setFormData({ name: "", email: "", brand: "", notes: "" });
+        resetTimerRef.current = null;
+      }, 6000);
+    } catch (err) {
+      // Network error, CORS block, or non-2xx HTTP status.
+      const message = err instanceof Error ? err.message : String(err);
+      setSubmitError(
+        `We couldn't deliver your message automatically (${message}). Please reach us directly via Instagram @boostify305 or email ${CONTACT_FORM_DESTINATION_EMAIL}.`
+      );
+    } finally {
+      setIsSubmitting(false);
     }
-    resetTimerRef.current = window.setTimeout(() => {
-      setSubmitted(false);
-      setFormData({ name: "", email: "", brand: "", notes: "" });
-      resetTimerRef.current = null;
-    }, 4000);
   };
 
   return (
@@ -609,7 +671,7 @@ export function ContactPage({ onBack }: SubpageProps) {
         {/* Right column: Form */}
         <div className="lg:col-span-7 p-8 border border-white/5 bg-white/[0.01]">
           {submitted ? (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className="min-h-[300px] flex flex-col justify-center items-center text-center gap-4"
@@ -619,7 +681,7 @@ export function ContactPage({ onBack }: SubpageProps) {
               </span>
               <h4 className="font-outfit font-bold text-xl uppercase tracking-wide">SECURE DISPATCH TRANSMITTED</h4>
               <p className="font-sans text-xs font-light text-white/50 max-w-xs leading-relaxed">
-                Thank you. Your message has bypassed standard routing filters and entered our primary creative queue. We will respond within 4 hours.
+                Thank you. Your message has been delivered to our creative team at {CONTACT_FORM_DESTINATION_EMAIL}. We will respond within 4 hours.
               </p>
             </motion.div>
           ) : (
@@ -684,11 +746,30 @@ export function ContactPage({ onBack }: SubpageProps) {
                 />
               </div>
 
-              <button 
+              {submitError && (
+                <div
+                  role="alert"
+                  className="border border-red-500/30 bg-red-500/5 px-4 py-3 font-sans text-[11px] font-light text-red-200/80 leading-relaxed"
+                >
+                  {submitError}
+                </div>
+              )}
+
+              <button
                 type="submit"
-                className="w-full py-4 border border-white/15 bg-white/5 hover:bg-white text-white hover:text-black font-outfit font-semibold text-xs tracking-[0.2em] uppercase transition-all duration-500 flex items-center justify-center gap-2 cursor-pointer"
+                disabled={isSubmitting}
+                className="w-full py-4 border border-white/15 bg-white/5 hover:bg-white text-white hover:text-black font-outfit font-semibold text-xs tracking-[0.2em] uppercase transition-all duration-500 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-wait disabled:hover:bg-white/5 disabled:hover:text-white"
               >
-                <Send className="w-3.5 h-3.5" /> SUBMIT CREATIVE TRANSMISSION
+                {isSubmitting ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    TRANSMITTING…
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5" /> SUBMIT CREATIVE TRANSMISSION
+                  </>
+                )}
               </button>
             </form>
           )}
