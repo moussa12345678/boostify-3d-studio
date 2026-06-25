@@ -3,7 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+
+    <!-- Security Headers (meta-based, since GitHub Pages does not allow custom HTTP headers) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://res.cloudinary.com data:; media-src 'self' https://res.cloudinary.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none';">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()">
+    <!-- Frame-buster (defense-in-depth against clickjacking).
+         Loaded as an external same-origin script so CSP `script-src 'self'` allows it.
+         CSP `frame-ancestors` is not enforced via <meta> tag — only via HTTP header.
+         GitHub Pages does not allow custom HTTP headers, so JS is the only mitigation. -->
+    <script src="/frame-buster.js"></script>
+
     <!-- Primary SEO Meta Tags -->
     <title>BOOSTIFY | Premium 3D Advertising, CGI Commercials & Luxury Brand Animations</title>
     <meta name="description" content="BOOSTIFY is a premium 3D visual production studio specializing in cinema-grade CGI commercials, fluid dynamics, and luxury product animations for global brands." />

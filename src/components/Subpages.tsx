@@ -635,6 +635,7 @@ export function ContactPage({ onBack }: SubpageProps) {
                   <input 
                     type="text" 
                     id="name-input"
+                    autoComplete="name"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -647,6 +648,7 @@ export function ContactPage({ onBack }: SubpageProps) {
                   <input 
                     type="email" 
                     id="email-input"
+                    autoComplete="email"
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -661,6 +663,7 @@ export function ContactPage({ onBack }: SubpageProps) {
                 <input 
                   type="text" 
                   id="brand-input"
+                  autoComplete="organization"
                   value={formData.brand}
                   onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
                   placeholder="e.g. Dior Sauvage, Tom Ford Beauty" 
@@ -672,6 +675,7 @@ export function ContactPage({ onBack }: SubpageProps) {
                 <label htmlFor="notes-input" className="font-mono text-[9px] tracking-widest text-white/40 uppercase">DESIGN BRIEF & DYNAMICS NOTES</label>
                 <textarea 
                   id="notes-input"
+                  autoComplete="off"
                   rows={4}
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}

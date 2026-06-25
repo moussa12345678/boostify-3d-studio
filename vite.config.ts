@@ -2,6 +2,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
+import sri from 'vite-plugin-sri';
 
 // GitHub Pages serves project sites at https://<user>.github.io/<repo>/
 // We allow overriding the base path via VITE_BASE_PATH env var so the same
@@ -11,7 +12,13 @@ const BASE = process.env.VITE_BASE_PATH || '/';
 export default defineConfig(() => {
   return {
     base: BASE,
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      sri({
+        algorithms: ['sha384'],
+      }),
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

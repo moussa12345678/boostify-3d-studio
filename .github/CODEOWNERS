@@ -1,0 +1,13 @@
+# These users will be automatically requested for review when PRs modify the matching files.
+# GitHub branch protection can require CODEOWNERS review before merge.
+
+* @moussa12345678
+
+# Security-critical paths — require owner review
+/.github/           @moussa12345678
+/package.json       @moussa12345678
+/package-lock.json  @moussa12345678
+/vite.config.ts     @moussa12345678
+/scripts/           @moussa12345678
+/index.html         @moussa12345678
+/public/            @moussa12345678

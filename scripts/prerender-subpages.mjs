@@ -323,4 +323,36 @@ for (const page of SUBPAGES) {
   generated++;
 }
 
+// === Post-SRI cleanup ===
+// The vite-plugin-sri package has a bug: its selector `$('link').filter('ref]')`
+// (intended to match link[rel="stylesheet"]) actually matches ALL <link> tags,
+// including <link rel="canonical"> and <link rel="preconnect">. This causes
+// `crossorigin="anonymous"` to be incorrectly added to non-stylesheet links.
+// We strip the spurious attribute from any <link> that is NOT a stylesheet.
+// We do this for index.html AND every prerendered subpage.
+function stripSpuriousCrossorigin(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  let html = fs.readFileSync(filePath, "utf8");
+  // Match <link ...> tags. Only keep crossorigin on those with rel="stylesheet".
+  html = html.replace(/<link\b[^>]*>/gi, (tag) => {
+    const isStylesheet = /rel\s*=\s*["']?stylesheet["']?/i.test(tag);
+    if (isStylesheet) return tag;
+    // Remove crossorigin attribute (handles crossorigin="" and crossorigin="anonymous")
+    return tag.replace(/\s+crossorigin(\s*=\s*("[^"]*"|'[^']*'|\S+))?/gi, "");
+  });
+  fs.writeFileSync(filePath, html, "utf8");
+}
+
+const htmlFilesToClean = [
+  path.join(DIST, "index.html"),
+  path.join(DIST, "services", "index.html"),
+  path.join(DIST, "portfolio", "index.html"),
+  path.join(DIST, "about-us", "index.html"),
+  path.join(DIST, "blog", "index.html"),
+  path.join(DIST, "contact", "index.html"),
+  path.join(DIST, "404.html"),
+];
+for (const f of htmlFilesToClean) {
+  stripSpuriousCrossorigin(f);
+}
 console.log(`[prerender] done — ${generated} subpage files generated.`);
