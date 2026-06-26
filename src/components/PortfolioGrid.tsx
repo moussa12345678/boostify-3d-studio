@@ -184,14 +184,25 @@ export default function PortfolioGrid() {
             let gridClasses = "md:col-span-12"; // default fallback
             let heightClasses = "aspect-[16/9]"; // default fallback
 
+            // Note: previously the odd-indexed branches used `md:ml-auto`
+            // (margin-left:auto) to push the card to the right. That broke
+            // CSS Grid sizing: with `aspect-ratio`-based children, the
+            // auto-margin absorbed the entire track as free space, the
+            // item's intrinsic width collapsed to 0, and the child's
+            // aspect-ratio then produced height=0 → the card disappeared
+            // in desktop view (7 of 14 cards were invisible).
+            // The fix is to drop `md:ml-auto` entirely — grid auto-flow
+            // already places odd cards next to even ones, preserving the
+            // asymmetric cinematic feel via `col-span` alternation and
+            // the `translate-y` offsets below.
             if (video.aspectRatio === "portrait") {
-              gridClasses = idx % 2 === 0 ? "md:col-span-5" : "md:col-span-5 md:ml-auto";
+              gridClasses = "md:col-span-5";
               heightClasses = "aspect-[3/4]";
             } else if (video.aspectRatio === "square") {
-              gridClasses = idx % 2 === 0 ? "md:col-span-6" : "md:col-span-6 md:ml-auto";
+              gridClasses = "md:col-span-6";
               heightClasses = "aspect-square";
             } else { // landscape video (16:9)
-              gridClasses = idx % 2 === 0 ? "md:col-span-7" : "md:col-span-7 md:ml-auto";
+              gridClasses = "md:col-span-7";
               heightClasses = "aspect-[16/9]";
             }
 
